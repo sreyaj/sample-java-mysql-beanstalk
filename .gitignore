@@ -1,5 +1,4 @@
 .elasticbeanstalk/
-shippable/
 target/
 .*.swp
 
