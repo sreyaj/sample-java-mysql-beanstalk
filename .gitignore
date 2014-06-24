@@ -1,0 +1,4 @@
+.elasticbeanstalk/
+target/
+.*.swp
+

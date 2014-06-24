@@ -1,0 +1,30 @@
+language: java
+
+jdk:
+   - oraclejdk7
+   - openjdk7
+
+env:
+  global:
+    - secure: RXkuFk+4jiIJm94QCOZKzoMWk3zcT6fA0KCHdM8TKbNvyaIG89CAmZp04tYQpZg6QXJjhLHchHUTkHRQG2urWPCgEoI7Cm1tZskXB1uHl1vmo6pLNK95HIVJEDKqdHyPuq6dWJOliNUnVPQtD8Sg4V+PTAfiFGfyyV78kvRFEzHIn3iEZgoJrnOHsEPXoUp8Qzcd2Ffu9CCjU4CGBYZY6ctjubhfUVEG/XAyNs3/vJixTOsW/0DNZ1z1itNfUit3cxROZHd5FA8ddqGN+zoK/7VMrMNeZm7NFeWeatxqYHepn/Pc2M4PG/LlWfXBMSz5xIY9oX9bZTkqR+FHCBubrA==
+
+before_script: 
+  - mkdir -p shippable/testresults
+  - mkdir -p shippable/codecoverage
+  - mysql -e 'create database if not exists test;'
+  - mkdir -p ~/.elasticbeanstalk
+  - echo 'AWSAccessKeyId=AKIAJSZ63DTL3Z7KLVEQ' >> ~/.elasticbeanstalk/aws_credential_file
+  - echo 'AWSSecretKey='$AWSSecretKey >> ~/.elasticbeanstalk/aws_credential_file
+
+script:
+  - mkdir -p .elasticbeanstalk
+  - cp config .elasticbeanstalk/
+  - mvn clean cobertura:cobertura
+  - mvn test -DRDS_PORT=3306 -DRDS_DB_NAME=test -DRDS_HOSTNAME=localhost -DRDS_PASSWORD= -DRDS_USERNAME=shippable
+
+after_success:
+  - mvn compile war:exploded
+  - cp -r target/App/* ./
+  - git add -f META-INF WEB-INF
+  - git commit -m "Deploy"
+  - export PATH=$PATH:$PWD/aws/eb/linux/python2.7/ && virtualenv ve && source ve/bin/activate && pip install -r aws/requirements.txt && eb init && eb push
