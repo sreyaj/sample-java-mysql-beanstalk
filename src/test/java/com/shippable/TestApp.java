@@ -1,7 +1,6 @@
 package com.shippable;
 
 import junit.framework.*;
-import com.shippable.Storage;
 
 public class TestApp extends TestCase {
   
