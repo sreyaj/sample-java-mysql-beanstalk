@@ -1,0 +1,8 @@
+branch-defaults:
+  master:
+    environment: sample-java-env
+global:
+  application_name: sample-java
+  default_region: us-west-2
+  profile: eb-cli
+  sc: git
